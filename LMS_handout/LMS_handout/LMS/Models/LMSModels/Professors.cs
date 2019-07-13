@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace LMS.Models.LMSModels
+{
+    public partial class Professors
+    {
+        public string UId { get; set; }
+        public string Department { get; set; }
+        public DateTime Dob { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public virtual Departments DepartmentNavigation { get; set; }
+    }
+}
