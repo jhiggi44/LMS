@@ -4,62 +4,68 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LMS.Models.LMSModels;
 
 namespace LMS.Controllers
 {
   public class CommonController : Controller
   {
 
-    /*******Begin code to modify********/
+        /*******Begin code to modify********/
 
-    // TODO: Uncomment and change 'X' after you have scaffoled
+        // TODO: Uncomment and change 'X' after you have scaffoled
 
-    /*
-    protected TeamXLMSContext db;
 
-    public CommonController()
-    {
-      db = new TeamXLMSContext();
-    }
-    */
+        protected Team12LMSContext db;
 
-    /*
-     * WARNING: This is the quick and easy way to make the controller
-     *          use a different LibraryContext - good enough for our purposes.
-     *          The "right" way is through Dependency Injection via the constructor 
-     *          (look this up if interested).
-    */
+        public CommonController() {
+            db = new Team12LMSContext();
+        }
 
-    // TODO: Uncomment and change 'X' after you have scaffoled
-    /*
-    public void UseLMSContext(TeamXLMSContext ctx)
-    {
-      db = ctx;
-    }
 
-    protected override void Dispose(bool disposing)
-    {
-      if (disposing)
-      {
-        db.Dispose();
-      }
-      base.Dispose(disposing);
-    }
-    */
+        /*
+         * WARNING: This is the quick and easy way to make the controller
+         *          use a different LibraryContext - good enough for our purposes.
+         *          The "right" way is through Dependency Injection via the constructor 
+         *          (look this up if interested).
+        */
+
+        // TODO: Uncomment and change 'X' after you have scaffoled
+
+        public void UseLMSContext(Team12LMSContext ctx) {
+            db = ctx;
+        }
+
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
 
 
-    /// <summary>
-    /// Retreive a JSON array of all departments from the database.
-    /// Each object in the array should have a field called "name" and "subject",
-    /// where "name" is the department name and "subject" is the subject abbreviation.
-    /// </summary>
-    /// <returns>The JSON array</returns>
-    public IActionResult GetDepartments()
-    {
-      // TODO: Do not return this hard-coded array.
-      return Json(new[] { new { name = "None", subject = "NONE" } });
-    }
+
+        /// <summary>
+        /// Retreive a JSON array of all departments from the database.
+        /// Each object in the array should have a field called "name" and "subject",
+        /// where "name" is the department name and "subject" is the subject abbreviation.
+        /// </summary>
+        /// <returns>The JSON array</returns>
+        public IActionResult GetDepartments() {
+            // TODO: Do not return this hard-coded array.
+
+           
+            using(db) { // may need to check if this line is acceptable - QC
+                var query = from d in db.Departments
+
+                select new { name = d.Name, subject = d.Subject};
+                return Json(query.ToArray());
+
+            }
+
+             //return Json(new[] { new { name = "None", subject = "NONE" } });
+        }
 
 
 
