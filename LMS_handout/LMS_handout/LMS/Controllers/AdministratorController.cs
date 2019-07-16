@@ -43,7 +43,7 @@ namespace LMS.Controllers {
                     from c in db.Courses
                     where subject == c.Department
 
-                    select new { number = c.Number, name = c.Number };
+                    select new { number = c.Number, name = c.Name };
 
                 return Json(query.ToArray());
 
@@ -160,12 +160,20 @@ namespace LMS.Controllers {
 
                     if (!classesQuery.Any() || !courseQuery.Any()) {
                         //create new Class
-                        Classes classes = new Classes();
+                        Classes cl = new Classes { Semester = season + " " + year, CatalogId = catalogID, StartTime = start, EndTime = end, Location = location, Professor = instructor };
 
+                        db.Classes.Add(cl);
+
+                        try {
+                            db.SaveChanges();
+                            return Json(new { success = true });
+                        }
+                        catch (Exception e) {
+                            Console.WriteLine(e.Message);
+                            return Json(new { success = false });
+                        }
 
                     }
-
-                    return Json(new { success = true });
 
                 }
             }
@@ -175,3 +183,6 @@ namespace LMS.Controllers {
 
     }
 }
+
+    
+   
