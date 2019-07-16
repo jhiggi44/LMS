@@ -486,91 +486,113 @@ namespace LMS.Controllers
     public string CreateNewUser(string fName, string lName, DateTime DOB, string SubjectAbbrev, string role) {
 
             //make sure user isnt already in DB
-            Team12LMSContext db = new Team12LMSContext();
+            using (Team12LMSContext db = new Team12LMSContext()) {
 
-            string uID = "u";
+                string uID = "";
 
-            switch (role) {
+                switch (role) {
 
-                case "Administrator":
-                    Console.WriteLine("I AM AND ADMINSTRATOR");
-                    //query administrator table 
-                    using(db) {
-                        var query =
-                            from a in db.Administrators
-                            where a.FirstName == fName &&
-                            a.LastName == lName &&
-                            a.Dob == DOB
-                            select a;
-                       
-                        //if new user not in db already then create the uID string to return 
-                        if (!query.Any()) {
-                            int rand = RandomNumber(0, 9999999);
-                            string randString = rand.ToString();
-                       
-                            return uID += randString;
+                    case "Administrator":
+
+                        while (true) {
+                            uID = "u" + RandomNumber(0, 9999999).ToString();
+
+                            var query =
+                                from a in db.Administrators
+                                where a.UId == uID
+                                select a;
+
+                            if (!query.Any()) {
+
+                                Administrators admin = new Administrators {
+                                    UId = uID,
+                                    FirstName = fName,
+                                    LastName = lName,
+                                    Dob = DOB
+                                };
+
+                                db.Administrators.Add(admin);
+
+                                try {
+                                    db.SaveChanges();
+                                }
+                                catch (Exception e) {
+                                    Console.WriteLine(e.Message);
+                                }
+                                break;
+                            }
                         }
-                    }
-                    break;
-                case "Professor":
-                    Console.WriteLine("I AM AND PROFESSOR");
-                    //query Professor table 
-                    using (db) {
-                        var query =
-                            from p in db.Professors
-                            where p.FirstName == fName &&
-                            p.LastName == lName &&
-                            p.Dob == DOB
-                            select p;
+                        break;
+                    case "Professor":
+                        while (true) {
+                            uID = "u" + RandomNumber(0, 9999999).ToString();
 
-                        //if new user not in db already Professors table then get department name 
-                        //?? having trouble seeing the point of pasing SubjectAbbrev as paramater when all we need to do is return a string 
-                        if (!query.Any()) {
-                            var depQuery =
-                                from d in db.Departments
-                                where d.Subject == SubjectAbbrev
-                                select d.Name;
+                            var query =
+                                from a in db.Professors
+                                where a.UId == uID
+                                select a;
 
-                            int rand = RandomNumber(0, 9999999);
-                            string randString = rand.ToString();
+                            if (!query.Any()) {
 
-                            uID += randString;
+                                Professors prof = new Professors {
+                                    UId = uID,
+                                    FirstName = fName,
+                                    LastName = lName,
+                                    Dob = DOB,
+                                    Department = SubjectAbbrev
+                                };
+
+                                db.Professors.Add(prof);
+
+                                try {
+                                    db.SaveChanges();
+                                }
+                                catch (Exception e) {
+                                    Console.WriteLine(e.Message);
+                                }
+                                break;
+                            }
                         }
-                    }
-                    break;
-                case "Student":
-                    Console.WriteLine("I AM AND STUDENT");
-                    //query Student table 
-                    using (db) {
-                        var query =
-                            from s in db.Students
-                            where s.FirstName == fName &&
-                            s.LastName == lName &&
-                            s.Dob == DOB
-                            select s;
+                        break;
+                    case "Student":
+                        while (true) {
+                            uID = "u" + RandomNumber(0, 9999999).ToString();
 
+                            var query =
+                                from a in db.Students
+                                where a.UId == uID
+                                select a;
 
-                        //if new user not in db already then create then get department name 
-                        if (!query.Any()) {
-                            var studentQuery =
-                                from d in db.Departments
-                                where d.Subject == SubjectAbbrev
-                                select d.Name;
+                            if (!query.Any()) {
 
-                            int rand = RandomNumber(0, 9999999);
-                            string randString = rand.ToString();
+                                Students student = new Students {
+                                    UId = uID,
+                                    FirstName = fName,
+                                    LastName = lName,
+                                    Dob = DOB,
+                                    Major = SubjectAbbrev
+                                };
 
-                            uID += randString;
+                                db.Students.Add(student);
+
+                                try {
+                                    db.SaveChanges();
+                                }
+                                catch (Exception e) {
+                                    Console.WriteLine(e.Message);
+                                }
+                                break;
+                            }
                         }
-                    }
-                    break;
-                default:
-                    Console.WriteLine("SOMETHING WENT WRONG");
-                    break;
+                        break;
+                    default:
+                        Console.WriteLine("SOMETHING WENT WRONG");
+                        break;
 
+                }
+
+                return uID;
             }
-
-            return uID;
     }
 
     public int RandomNumber(int min, int max) {
