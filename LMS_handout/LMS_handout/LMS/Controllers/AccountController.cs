@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using LMS.Models;
 using LMS.Models.AccountViewModels;
 using LMS.Services;
+using LMS.Models.LMSModels;
 
 namespace LMS.Controllers
 {
@@ -480,21 +481,110 @@ namespace LMS.Controllers
     /// <param name="lName">Last Name</param>
     /// <param name="DOB">Date of Birth</param>
     /// <param name="SubjectAbbrev">The department the user belongs to (professors and students only)</param>
-    /// <param name="SubjectAbbrev">The user's role: one of "Administrator", "Professor", "Student"</param> 
+    /// <param name="role">The user's role: one of "Administrator", "Professor", "Student"</param> 
     /// <returns>A unique uID that is not be used by anyone else</returns>
-    public string CreateNewUser(string fName, string lName, DateTime DOB, string SubjectAbbrev, string role)
-    {
-      return "";
+    public string CreateNewUser(string fName, string lName, DateTime DOB, string SubjectAbbrev, string role) {
+
+            //make sure user isnt already in DB
+            Team12LMSContext db = new Team12LMSContext();
+
+            string uID = "u";
+
+            switch (role) {
+
+                case "Administrator":
+                    Console.WriteLine("I AM AND ADMINSTRATOR");
+                    //query administrator table 
+                    using(db) {
+                        var query =
+                            from a in db.Administrators
+                            where a.FirstName == fName &&
+                            a.LastName == lName &&
+                            a.Dob == DOB
+                            select a;
+                       
+                        //if new user not in db already then create the uID string to return 
+                        if (!query.Any()) {
+                            int rand = RandomNumber(0, 9999999);
+                            string randString = rand.ToString();
+                       
+                            return uID += randString;
+                        }
+                    }
+                    break;
+                case "Professor":
+                    Console.WriteLine("I AM AND PROFESSOR");
+                    //query Professor table 
+                    using (db) {
+                        var query =
+                            from p in db.Professors
+                            where p.FirstName == fName &&
+                            p.LastName == lName &&
+                            p.Dob == DOB
+                            select p;
+
+                        //if new user not in db already Professors table then get department name 
+                        //?? having trouble seeing the point of pasing SubjectAbbrev as paramater when all we need to do is return a string 
+                        if (!query.Any()) {
+                            var depQuery =
+                                from d in db.Departments
+                                where d.Subject == SubjectAbbrev
+                                select d.Name;
+
+                            int rand = RandomNumber(0, 9999999);
+                            string randString = rand.ToString();
+
+                            uID += randString;
+                        }
+                    }
+                    break;
+                case "Student":
+                    Console.WriteLine("I AM AND STUDENT");
+                    //query Student table 
+                    using (db) {
+                        var query =
+                            from s in db.Students
+                            where s.FirstName == fName &&
+                            s.LastName == lName &&
+                            s.Dob == DOB
+                            select s;
+
+
+                        //if new user not in db already then create then get department name 
+                        if (!query.Any()) {
+                            var studentQuery =
+                                from d in db.Departments
+                                where d.Subject == SubjectAbbrev
+                                select d.Name;
+
+                            int rand = RandomNumber(0, 9999999);
+                            string randString = rand.ToString();
+
+                            uID += randString;
+                        }
+                    }
+                    break;
+                default:
+                    Console.WriteLine("SOMETHING WENT WRONG");
+                    break;
+
+            }
+
+            return uID;
     }
 
-    /*******End code to modify********/
+    public int RandomNumber(int min, int max) {
+        Random random = new Random();
+        return random.Next(min, max);
+    }
+        /*******End code to modify********/
 
 
-    
 
-    #region Helpers
 
-    private void AddErrors(IdentityResult result)
+        #region Helpers
+
+        private void AddErrors(IdentityResult result)
     {
       foreach (var error in result.Errors)
       {

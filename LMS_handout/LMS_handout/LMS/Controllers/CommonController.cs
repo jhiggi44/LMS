@@ -53,9 +53,7 @@ namespace LMS.Controllers
         /// </summary>
         /// <returns>The JSON array</returns>
         public IActionResult GetDepartments() {
-            // TODO: Do not return this hard-coded array.
-
-           
+            // TODO: FINISHED (double check my work)
             using(db) { // may need to check if this line is acceptable - QC
                 var query = from d in db.Departments
 
@@ -63,7 +61,6 @@ namespace LMS.Controllers
                 return Json(query.ToArray());
 
             }
-
              //return Json(new[] { new { name = "None", subject = "NONE" } });
         }
 
