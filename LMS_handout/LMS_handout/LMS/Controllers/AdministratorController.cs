@@ -75,18 +75,26 @@ namespace LMS.Controllers
         /// false if the course already exists, true otherwise.</returns>
         public IActionResult CreateCourse(string subject, int number, string name) {
             using (Team12LMSContext db = new Team12LMSContext()) {
-                Courses course = new Courses { Name = name, Number = (ushort)number, Department = subject };
 
-                db.Courses.Add(course);
+                var query = from c in db.Courses
+                            select c;
 
-                try {
-                    db.SaveChanges();
-                } catch (Exception e) {
-                    Console.WriteLine(e.Message);
-                    return Json(new { success = false });
-                }
+                if (!query.Any()) {
+                    Courses course = new Courses { Name = name, Number = (ushort)number, Department = subject };
 
-                return Json(new { success = true });
+                    db.Courses.Add(course);
+
+                    try {
+                        db.SaveChanges();
+                        return Json(new { success = true });
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                        return Json(new { success = false });
+                    }
+                } 
+
+                return Json(new { success = false });
             } 
         }
 
