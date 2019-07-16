@@ -134,7 +134,7 @@ namespace LMS.Models.LMSModels
                     .HasColumnName("CatalogID")
                     .HasColumnType("char(5)");
 
-                entity.Property(e => e.EndTime).HasColumnType("time");
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
 
                 entity.Property(e => e.Location)
                     .IsRequired()
@@ -148,7 +148,7 @@ namespace LMS.Models.LMSModels
                     .IsRequired()
                     .HasColumnType("varchar(11)");
 
-                entity.Property(e => e.StartTime).HasColumnType("time");
+                entity.Property(e => e.StartTime).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Catalog)
                     .WithMany(p => p.Classes)

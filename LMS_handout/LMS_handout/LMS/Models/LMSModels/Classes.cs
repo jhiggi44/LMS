@@ -15,8 +15,8 @@ namespace LMS.Models.LMSModels
         public string Semester { get; set; }
         public string CatalogId { get; set; }
         public string Location { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         public string Professor { get; set; }
 
         public virtual Courses Catalog { get; set; }
