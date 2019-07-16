@@ -77,6 +77,7 @@ namespace LMS.Controllers
             using (Team12LMSContext db = new Team12LMSContext()) {
 
                 var query = from c in db.Courses
+                            where c.Department == subject && c.Number == number
                             select c;
 
                 if (!query.Any()) {
