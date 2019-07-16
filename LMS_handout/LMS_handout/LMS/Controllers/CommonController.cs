@@ -59,7 +59,6 @@ namespace LMS.Controllers
 
                 select new { name = d.Name, subject = d.Subject};
                 return Json(query.ToArray());
-
             }
              //return Json(new[] { new { name = "None", subject = "NONE" } });
         }
