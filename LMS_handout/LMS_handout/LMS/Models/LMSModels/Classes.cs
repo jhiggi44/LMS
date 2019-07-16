@@ -17,8 +17,10 @@ namespace LMS.Models.LMSModels
         public string Location { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
+        public string Professor { get; set; }
 
         public virtual Courses Catalog { get; set; }
+        public virtual Professors ProfessorNavigation { get; set; }
         public virtual ICollection<AssignmentCategories> AssignmentCategories { get; set; }
         public virtual ICollection<EnrollmentGrade> EnrollmentGrade { get; set; }
     }

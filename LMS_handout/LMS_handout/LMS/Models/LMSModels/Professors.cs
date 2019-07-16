@@ -5,6 +5,11 @@ namespace LMS.Models.LMSModels
 {
     public partial class Professors
     {
+        public Professors()
+        {
+            Classes = new HashSet<Classes>();
+        }
+
         public string UId { get; set; }
         public string Department { get; set; }
         public DateTime Dob { get; set; }
@@ -12,5 +17,6 @@ namespace LMS.Models.LMSModels
         public string LastName { get; set; }
 
         public virtual Departments DepartmentNavigation { get; set; }
+        public virtual ICollection<Classes> Classes { get; set; }
     }
 }

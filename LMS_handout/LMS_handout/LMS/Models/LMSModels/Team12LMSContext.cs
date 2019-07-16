@@ -120,6 +120,9 @@ namespace LMS.Models.LMSModels
                 entity.HasKey(e => e.ClassId)
                     .HasName("PRIMARY");
 
+                entity.HasIndex(e => e.Professor)
+                    .HasName("Professor");
+
                 entity.HasIndex(e => new { e.CatalogId, e.Semester })
                     .HasName("CatalogID")
                     .IsUnique();
@@ -137,6 +140,10 @@ namespace LMS.Models.LMSModels
                     .IsRequired()
                     .HasColumnType("varchar(100)");
 
+                entity.Property(e => e.Professor)
+                    .IsRequired()
+                    .HasColumnType("char(8)");
+
                 entity.Property(e => e.Semester)
                     .IsRequired()
                     .HasColumnType("varchar(11)");
@@ -148,6 +155,12 @@ namespace LMS.Models.LMSModels
                     .HasForeignKey(d => d.CatalogId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Classes_ibfk_1");
+
+                entity.HasOne(d => d.ProfessorNavigation)
+                    .WithMany(p => p.Classes)
+                    .HasForeignKey(d => d.Professor)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Classes_ibfk_2");
             });
 
             modelBuilder.Entity<Courses>(entity =>
