@@ -118,7 +118,7 @@ namespace LMS.Controllers {
                 join s in db.Students
                 on g.UId equals s.UId
 
-                select new { firstName = s.FirstName, lastName = s.LastName, uid = s.UId, dob = s.Dob, grade = g.Grade };
+                select new { fname = s.FirstName, lname = s.LastName, uid = s.UId, dob = s.Dob, grade = g.Grade };
 
             return Json(query.ToArray());
         }
