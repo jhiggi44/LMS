@@ -60,17 +60,14 @@ namespace LMS.Controllers {
         /// <param name="subject">The department subject abbreviation</param>
         /// <returns>The JSON result</returns>
         public IActionResult GetProfessors(string subject) {
+            var query =
+                from d in db.Departments
+                join p in db.Professors
+                on d.Subject equals subject
+                select new { lname = p.LastName, fname = p.FirstName, uid = p.UId };
 
-            using (Team12LMSContext db = new Team12LMSContext()) {
-
-                var query =
-                    from d in db.Departments
-                    join p in db.Professors
-                    on d.Subject equals subject
-                    select new { lastName = p.LastName, firstName = p.FirstName, uID = p.UId };
-
-                return Json(query.ToArray());
-            }
+            return Json(query.ToArray());
+        
         }
 
 
