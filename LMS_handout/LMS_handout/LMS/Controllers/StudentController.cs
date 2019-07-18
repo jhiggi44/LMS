@@ -217,19 +217,35 @@ namespace LMS.Controllers
                     select a;
 
                 if (hasSubbedQ.Any()) {
-
+                    foreach (var result in hasSubbedQ) {
+                        result.Contents = contents;
+                        result.Time = DateTime.Now;
+                    }
+                    try {
+                        db.SaveChanges();
+                        return Json(new { success = true });
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                    }
                 } else {
                     Submission sub = new Submission {
                         AId = aid,
-
-
+                        UId = uid,
+                        Time = DateTime.Now,
+                        Contents = contents,
+                        Score = 0
                     };
+                    db.Submission.Add(sub);
 
+                    try {
+                        db.SaveChanges();
+                        return Json(new { success = true });
+                    } catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
-
-
-            
 
             return Json(new { success = false });
         }
@@ -283,7 +299,7 @@ namespace LMS.Controllers
                     EnrollmentGrade enroll = new EnrollmentGrade {
                         UId = uid,
                         CId = query2.First().cID,
-                        Grade = "E"
+                        Grade = "--"
                     };
 
                     db.EnrollmentGrade.Add(enroll);
@@ -301,6 +317,15 @@ namespace LMS.Controllers
         }
 
 
+        Dictionary<string, double> getGradeMap() {
+           return new Dictionary<string, double>() {
+                { "A", 4.0 }, { "A-", 3.7 },
+                { "B+", 3.3 }, { "B", 3.0 }, { "B-", 2.7 },
+                { "C+", 2.3 }, { "C", 2.0 }, { "C-", 1.7 },
+                { "D+", 1.3 }, { "D", 1.0 }, { "D-", 0.7 }
+            };
+        }
+
 
         /// <summary>
         /// Calculates a student's GPA
@@ -314,8 +339,21 @@ namespace LMS.Controllers
         /// <param name="uid">The uid of the student</param>
         /// <returns>A JSON object containing a single field called "gpa" with the number value</returns>
         public IActionResult GetGPA(string uid) {
+            var gradeDict = getGradeMap();
+            var gradeQ =
+                from grades in db.EnrollmentGrade
+                where grades.UId == uid
+                select grades;
 
-            return Json(null);
+            if (gradeQ.Any()) {
+                foreach (var row in gradeQ) {
+                    
+                }
+            }
+
+
+
+            return Json(new { gpa = 0.0 });
         }
 
         /*******End code to modify********/
