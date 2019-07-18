@@ -346,9 +346,14 @@ namespace LMS.Controllers
                 select grades;
 
             if (gradeQ.Any()) {
+                double credits = gradeQ.Count() * 4;
+                double sum = 0;
                 foreach (var row in gradeQ) {
-                    
+                    if (row.Grade != "--") {
+                        sum += gradeDict[row.Grade];
+                    }
                 }
+                return Json(new { gpa = (sum * credits) / credits });
             }
 
 
