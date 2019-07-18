@@ -12151,23 +12151,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Jordan Higgins\\.nuget\\packages\\": {},
+    "C:\\Users\\Quincy\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Jordan Higgins\\Desktop\\phase_3\\LMS_handout\\LMS_handout\\LMS\\LMS.csproj",
+      "projectUniqueName": "C:\\Users\\Quincy\\Desktop\\git\\phase_3\\LMS_handout\\LMS_handout\\LMS\\LMS.csproj",
       "projectName": "LMS",
-      "projectPath": "C:\\Users\\Jordan Higgins\\Desktop\\phase_3\\LMS_handout\\LMS_handout\\LMS\\LMS.csproj",
-      "packagesPath": "C:\\Users\\Jordan Higgins\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Jordan Higgins\\Desktop\\phase_3\\LMS_handout\\LMS_handout\\LMS\\obj\\",
+      "projectPath": "C:\\Users\\Quincy\\Desktop\\git\\phase_3\\LMS_handout\\LMS_handout\\LMS\\LMS.csproj",
+      "packagesPath": "C:\\Users\\Quincy\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Quincy\\Desktop\\git\\phase_3\\LMS_handout\\LMS_handout\\LMS\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Jordan Higgins\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Quincy\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
