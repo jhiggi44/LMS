@@ -345,17 +345,26 @@ namespace LMS.Controllers {
                     from jnd in joined
                     where jnd.Name == category
                     select jnd;
-                if (!assignmentQuery.Any()) {
+                if (assignmentQuery.Any()) {
+                    var categoryId = assignmentQuery.First().CategoryId;
+                    Assignments assignment = new Assignments {
+                        Category = categoryId,
+                        Name = asgname,
+                        Points = (uint) asgpoints,
+                        DueDate = asgdue,
+                        Contents = asgcontents
+                    };
+
+                    db.Assignments.Add(assignment);
 
                     try {
                         //need the updated code to finish this portion 
+                        db.SaveChanges();
                         return Json(new { success = true });
                     } catch (Exception e){
                         Console.WriteLine(e.Message);
                     }
                 }
-
-
             }
 
             return Json(new { success = false });
@@ -381,7 +390,36 @@ namespace LMS.Controllers {
         /// <returns>The JSON array</returns>
         public IActionResult GetSubmissionsToAssignment(string subject, int num, string season, int year, string category, string asgname) {
 
-            return Json(null);
+            string semester = season + " " + year;
+
+            var query =
+                from crs in db.Courses
+                where crs.Number == num
+                && crs.Department == subject
+                join clss in db.Classes
+                on crs.CatalogId equals clss.CatalogId into crsOfferings
+
+                from offs in crsOfferings
+                where offs.Semester == semester
+                join cats in db.AssignmentCategories
+                on offs.ClassId equals cats.ClassId into clssCategories
+
+                from clscat in clssCategories
+                where clscat.Name == category
+                join assigns in db.Assignments
+                on clscat.CategoryId equals assigns.Category into catAssignments
+
+                from catsign in catAssignments
+                where catsign.Name == asgname
+                join subs in db.Submission
+                on catsign.AId equals subs.AId into allSubmissions
+
+                from alsubs in allSubmissions
+                join studs in db.Students
+                on alsubs.UId equals studs.UId
+                select new { fname = studs.FirstName, lname = studs.LastName, uid = studs.UId, time = alsubs.Time, score = alsubs.Score };
+
+            return Json(query.ToArray());
         }
 
 
@@ -399,7 +437,48 @@ namespace LMS.Controllers {
         /// <returns>A JSON object containing success = true/false</returns>
         public IActionResult GradeSubmission(string subject, int num, string season, int year, string category, string asgname, string uid, int score) {
 
-            return Json(new { success = true });
+            string semester = season + " " + year;
+
+            var query =
+              from crs in db.Courses
+              where crs.Number == num
+              && crs.Department == subject
+              join clss in db.Classes
+              on crs.CatalogId equals clss.CatalogId into crsOfferings
+
+              from offs in crsOfferings
+              where offs.Semester == semester
+              join cats in db.AssignmentCategories
+              on offs.ClassId equals cats.ClassId into clssCategories
+
+              from clscat in clssCategories
+              where clscat.Name == category
+              join assigns in db.Assignments
+              on clscat.CategoryId equals assigns.Category into catAssignments
+
+              from catsign in catAssignments
+              where catsign.Name == asgname
+              join subs in db.Submission
+              on catsign.AId equals subs.AId into allSubmissions
+
+              from alsubs in allSubmissions
+              where alsubs.UId == uid
+              select alsubs;
+
+            if (query.Any()) {
+                foreach (var result in query) {
+                    result.Score = (uint) score;
+                }
+                try {
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            return Json(new { success = false });
         }
 
 

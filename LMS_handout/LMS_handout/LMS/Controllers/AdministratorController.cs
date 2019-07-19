@@ -62,8 +62,9 @@ namespace LMS.Controllers {
         public IActionResult GetProfessors(string subject) {
             var query =
                 from d in db.Departments
+                where d.Subject == subject
                 join p in db.Professors
-                on d.Subject equals subject
+                on d.Subject equals p.Department
                 select new { lname = p.LastName, fname = p.FirstName, uid = p.UId };
 
             return Json(query.ToArray());

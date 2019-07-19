@@ -141,19 +141,23 @@ namespace LMS.Controllers
 
                     from clat in clssCats
                     join assigns in db.Assignments
-                    on clat.CategoryId equals assigns.Category into clssAssigns
+                    on clat.CategoryId equals assigns.Category
 
-                    from clsign in clssAssigns.DefaultIfEmpty()
-                    join submits in db.Submission
-                    on clsign.AId equals submits.AId
+                    //from clsign in clssAssigns
+                    //join submits in db.Submission.DefaultIfEmpty()
+                    //on clsign.AId equals submits.AId
                     select new {
-                        aname = clsign.Name,
+                        aname = assigns.Name,
                         cname = clat.Name,
-                        due = clsign.DueDate,
-                        score = submits == null ? (decimal?)null : submits.Score
+                        due = assigns.DueDate,
+                        score = 0
                     };
 
-                return Json(assignmentQ.ToArray());
+                if (assignmentQ.Any()) {
+                    return Json(assignmentQ.ToArray());
+                }
+
+                
             }
 
             return Json(null);
@@ -275,10 +279,11 @@ namespace LMS.Controllers
                 from cls2 in classes
                 where cls2.Semester == semester
                 join enroll in db.EnrollmentGrade
-                on cls2.ClassId equals enroll.CId into enrolled
+                on cls2.ClassId equals enroll.CId into enrollments
 
-                from all in enrolled
-                select new { uID = all.UId };
+                from enroll2 in enrollments
+                where enroll2.UId == uid
+                select new { uID = enroll2.UId };
 
             if (query.Any()) {
                 return Json(new { success = false });
