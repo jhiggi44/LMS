@@ -143,30 +143,29 @@ namespace LMS.Controllers {
         /// <returns>The JSON array</returns>
         public IActionResult GetAssignmentsInCategory(string subject, int num, string season, int year, string category) {
 
-            List<Object> objects = new List<Object>();
+            List<Object> assignnmentsList = new List<Object>();
             string semster = season + ' ' + year;
             if (category != null) {
                 var query =
-                    from ac in db.AssignmentCategories
-                    where ac.Name == category
-                    join a in db.Assignments
-                    on ac.CategoryId equals a.Category into catagories
+                    from assigns in db.Assignments
+                    join cats in db.AssignmentCategories
+                    on assigns.Category equals cats.CategoryId into assignmentsInCategory
 
-                    from c in catagories
-                    join cls in db.Classes
-                    on ac.ClassId equals cls.ClassId
-                    into combined
+                    from acats in assignmentsInCategory
+                    where acats.Name == category
+                    join clss in db.Classes
+                    on acats.ClassId equals clss.ClassId into assignmentsInClass
 
-                    from cmb in combined
-                    where cmb.Semester == semster
+                    from aclss in assignmentsInClass
+                    where aclss.Semester == semster
                     join cr in db.Courses
-                    on cmb.CatalogId equals cr.CatalogId into data
+                    on aclss.CatalogId equals cr.CatalogId into assignmentsInSemester
 
-                    from d in data
-                    where d.Number == num &&
-                    d.Department == subject
+                    from asem in assignmentsInSemester
+                    where asem.Number == num &&
+                    asem.Department == subject
 
-                    select new { aname = ac.Name, cname = c.Category, due = c.DueDate, aID = c.AId};
+                    select new { aname = assigns.Name, cname = acats.Name, due = assigns.DueDate, aID = assigns.AId};
 
                 foreach (var t in query) {
                     var submissionQuery =
@@ -174,32 +173,33 @@ namespace LMS.Controllers {
                         where s.AId == t.aID
                         select s;
 
-                    objects.Add(new { t.aname, t.cname, t.due, submissions  = submissionQuery.Count() });
+                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions  = submissionQuery.Count() });
                 }
 
                 return Json(query.ToArray());
                    
-            } else {
+            }
+            else {
+
                 var query =
-                    from ac in db.AssignmentCategories
-                    join a in db.Assignments
-                    on ac.CategoryId equals a.Category into catagories
+                    from assigns in db.Assignments
+                    join cats in db.AssignmentCategories
+                    on assigns.Category equals cats.CategoryId into assignmentsInCategory
 
-                    from c in catagories
-                    join cls in db.Classes
-                    on ac.ClassId equals cls.ClassId
-                    into combined
+                    from acats in assignmentsInCategory
+                    join clss in db.Classes
+                    on acats.ClassId equals clss.ClassId into assignmentsInClass
 
-                    from cmb in combined
-                    where cmb.Semester == semster
+                    from aclss in assignmentsInClass
+                    where aclss.Semester == semster
                     join cr in db.Courses
-                    on cmb.CatalogId equals cr.CatalogId into data
+                    on aclss.CatalogId equals cr.CatalogId into assignmentsInSemester
 
-                    from d in data
-                    where d.Number == num &&
-                    d.Department == subject
+                    from asem in assignmentsInSemester
+                    where asem.Number == num &&
+                    asem.Department == subject
 
-                    select new { aname = ac.Name, cname = c.Category, due = c.DueDate, aID = c.AId };
+                    select new { aname = assigns.Name, cname = acats.Name, due = assigns.DueDate, aID = assigns.AId };
 
                 foreach (var t in query) {
                     var submissionQuery =
@@ -207,9 +207,9 @@ namespace LMS.Controllers {
                         where s.AId == t.aID
                         select s;
 
-                    objects.Add(new { t.aname, t.cname, t.due, submissions = submissionQuery.Count() });
+                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions = submissionQuery.Count() });
                 }
-                return Json(query.ToArray());
+                return Json(assignnmentsList.ToArray());
 
             }
 

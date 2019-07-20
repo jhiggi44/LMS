@@ -141,16 +141,16 @@ namespace LMS.Controllers
 
                     from clat in clssCats
                     join assigns in db.Assignments
-                    on clat.CategoryId equals assigns.Category
+                    on clat.CategoryId equals assigns.Category into clssAssigns
 
-                    //from clsign in clssAssigns
-                    //join submits in db.Submission.DefaultIfEmpty()
-                    //on clsign.AId equals submits.AId
+                    from clsign in clssAssigns
+                    join submits in db.Submission
+                    on clsign.AId equals submits.AId
                     select new {
-                        aname = assigns.Name,
+                        aname = clsign.Name,
                         cname = clat.Name,
-                        due = assigns.DueDate,
-                        score = 0
+                        due = clsign.DueDate,
+                        score = submits.Score
                     };
 
                 if (assignmentQ.Any()) {
