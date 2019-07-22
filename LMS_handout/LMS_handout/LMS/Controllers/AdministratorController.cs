@@ -36,18 +36,13 @@ namespace LMS.Controllers {
         /// <returns>The JSON result</returns>
         public IActionResult GetCourses(string subject) {
 
+            var query =
+                from c in db.Courses
+                where subject == c.Department
 
-            using (Team12LMSContext db = new Team12LMSContext()) {
+                select new { number = c.Number, name = c.Name };
 
-                var query =
-                    from c in db.Courses
-                    where subject == c.Department
-
-                    select new { number = c.Number, name = c.Name };
-
-                return Json(query.ToArray());
-
-            }
+            return Json(query.ToArray());
         }
 
         /// <summary>
@@ -83,28 +78,27 @@ namespace LMS.Controllers {
         /// <returns>A JSON object containing {success = true/false}.
         /// false if the course already exists, true otherwise.</returns>
         public IActionResult CreateCourse(string subject, int number, string name) {
-            using (Team12LMSContext db = new Team12LMSContext()) {
 
-                var query = from c in db.Courses
-                            where c.Department == subject && c.Number == number
-                            select c;
+            var query = from c in db.Courses
+                        where c.Department == subject && c.Number == number
+                        select c;
 
-                if (!query.Any()) {
-                    Courses course = new Courses { Name = name, Number = (ushort)number, Department = subject };
+            if (!query.Any()) {
+                Courses course = new Courses { Name = name, Number = (ushort)number, Department = subject };
 
-                    db.Courses.Add(course);
+                db.Courses.Add(course);
 
-                    try {
-                        db.SaveChanges();
-                        return Json(new { success = true });
-                    } catch (Exception e) {
-                        Console.WriteLine(e.Message);
-                        return Json(new { success = false });
-                    }
+                try {
+                    db.SaveChanges();
+                    return Json(new { success = true });
                 }
-
-                return Json(new { success = false });
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                    return Json(new { success = false });
+                }
             }
+
+            return Json(new { success = false });
         }
 
 
@@ -127,53 +121,51 @@ namespace LMS.Controllers {
         /// true otherwise.</returns>
         public IActionResult CreateClass(string subject, int number, string season, int year, DateTime start, DateTime end, string location, string instructor) {
 
-            using (Team12LMSContext db = new Team12LMSContext()) {
-                var courseQuery =
-                    from c in db.Courses
-                    where c.Department == subject &&
-                    c.Number == number
+            var courseQuery =
+                from c in db.Courses
+                where c.Department == subject &&
+                c.Number == number
+                select c;
+
+            string subjecAbrevv = "";
+            string catalogID = "";
+            foreach (var t in courseQuery) {
+                catalogID = t.CatalogId;
+                subjecAbrevv = t.Department;
+            }
+
+            if (courseQuery.Any()) {
+                //query 
+                var classesQuery =
+                    from c in db.Classes
+                    where c.Location == location &&
+                    c.StartTime.ToString() == start.ToString() && c.EndTime.ToString() == end.ToString()
+                    && c.Semester == season
                     select c;
 
-                string subjecAbrevv = "";
-                string catalogID = "";
-                foreach (var t in courseQuery) {
-                    catalogID = t.CatalogId;
-                    subjecAbrevv = t.Department;
-                }
+                var coursesQuery =
+                    from crs in db.Classes
+                    where catalogID == crs.CatalogId &&
+                    crs.Semester == season
+                    select crs;
 
-                if (courseQuery.Any()) {
-                    //query 
-                    var classesQuery =
-                        from c in db.Classes
-                        where c.Location == location &&
-                        c.StartTime.ToString() == start.ToString() && c.EndTime.ToString() == end.ToString()
-                        && c.Semester == season
-                        select c;
+                if (!classesQuery.Any() || !courseQuery.Any()) {
+                    //create new Class
+                    Classes cl = new Classes { Semester = season + " " + year, CatalogId = catalogID, StartTime = start, EndTime = end, Location = location, Professor = instructor };
 
-                    var coursesQuery =
-                        from crs in db.Classes
-                        where catalogID == crs.CatalogId &&
-                        crs.Semester == season
-                        select crs;
+                    db.Classes.Add(cl);
 
-                    if (!classesQuery.Any() || !courseQuery.Any()) {
-                        //create new Class
-                        Classes cl = new Classes { Semester = season + " " + year, CatalogId = catalogID, StartTime = start, EndTime = end, Location = location, Professor = instructor };
-
-                        db.Classes.Add(cl);
-
-                        try {
-                            db.SaveChanges();
-                            return Json(new { success = true });
-                        }
-                        catch (Exception e) {
-                            Console.WriteLine(e.Message);
-                            return Json(new { success = false });
-                        }
-
+                    try {
+                        db.SaveChanges();
+                        return Json(new { success = true });
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                        return Json(new { success = false });
                     }
 
                 }
+
             }
             return Json(new { success = false });
         }

@@ -471,131 +471,127 @@ namespace LMS.Controllers
     }
 
 
-    /*******Begin code to modify********/
+        /*******Begin code to modify********/
 
-    /// <summary>
-    /// Create a new user of the LMS with the specified information.
-    /// Assigns the user a unique uID consisting of a 'u' followed by 7 digits.
-    /// </summary>
-    /// <param name="fName">First Name</param>
-    /// <param name="lName">Last Name</param>
-    /// <param name="DOB">Date of Birth</param>
-    /// <param name="SubjectAbbrev">The department the user belongs to (professors and students only)</param>
-    /// <param name="role">The user's role: one of "Administrator", "Professor", "Student"</param> 
-    /// <returns>A unique uID that is not be used by anyone else</returns>
-    public string CreateNewUser(string fName, string lName, DateTime DOB, string SubjectAbbrev, string role) {
+        /// <summary>
+        /// Create a new user of the LMS with the specified information.
+        /// Assigns the user a unique uID consisting of a 'u' followed by 7 digits.
+        /// </summary>
+        /// <param name="fName">First Name</param>
+        /// <param name="lName">Last Name</param>
+        /// <param name="DOB">Date of Birth</param>
+        /// <param name="SubjectAbbrev">The department the user belongs to (professors and students only)</param>
+        /// <param name="role">The user's role: one of "Administrator", "Professor", "Student"</param> 
+        /// <returns>A unique uID that is not be used by anyone else</returns>
+        public string CreateNewUser(string fName, string lName, DateTime DOB, string SubjectAbbrev, string role) {
 
-            //make sure user isnt already in DB
-            using (Team12LMSContext db = new Team12LMSContext()) {
+            string uID = "";
 
-                string uID = "";
+            switch (role) {
 
-                switch (role) {
+                case "Administrator":
 
-                    case "Administrator":
+                    while (true) {
+                        uID = "u" + RandomNumber(0, 9999999).ToString();
 
-                        while (true) {
-                            uID = "u" + RandomNumber(0, 9999999).ToString();
+                        var query =
+                            from a in db.Administrators
+                            where a.UId == uID
+                            select a;
 
-                            var query =
-                                from a in db.Administrators
-                                where a.UId == uID
-                                select a;
+                        if (!query.Any()) {
 
-                            if (!query.Any()) {
+                            Administrators admin = new Administrators {
+                                UId = uID,
+                                FirstName = fName,
+                                LastName = lName,
+                                Dob = DOB
+                            };
 
-                                Administrators admin = new Administrators {
-                                    UId = uID,
-                                    FirstName = fName,
-                                    LastName = lName,
-                                    Dob = DOB
-                                };
+                            db.Administrators.Add(admin);
 
-                                db.Administrators.Add(admin);
-
-                                try {
-                                    db.SaveChanges();
-                                }
-                                catch (Exception e) {
-                                    Console.WriteLine(e.Message);
-                                }
-                                break;
+                            try {
+                                db.SaveChanges();
                             }
-                        }
-                        break;
-                    case "Professor":
-                        while (true) {
-                            uID = "u" + RandomNumber(0, 9999999).ToString();
-
-                            var query =
-                                from a in db.Professors
-                                where a.UId == uID
-                                select a;
-
-                            if (!query.Any()) {
-
-                                Professors prof = new Professors {
-                                    UId = uID,
-                                    FirstName = fName,
-                                    LastName = lName,
-                                    Dob = DOB,
-                                    Department = SubjectAbbrev
-                                };
-
-                                db.Professors.Add(prof);
-
-                                try {
-                                    db.SaveChanges();
-                                }
-                                catch (Exception e) {
-                                    Console.WriteLine(e.Message);
-                                }
-                                break;
+                            catch (Exception e) {
+                                Console.WriteLine(e.Message);
                             }
+                            break;
                         }
-                        break;
-                    case "Student":
-                        while (true) {
-                            uID = "u" + RandomNumber(0, 9999999).ToString();
+                    }
+                    break;
+                case "Professor":
+                    while (true) {
+                        uID = "u" + RandomNumber(0, 9999999).ToString();
 
-                            var query =
-                                from a in db.Students
-                                where a.UId == uID
-                                select a;
+                        var query =
+                            from a in db.Professors
+                            where a.UId == uID
+                            select a;
 
-                            if (!query.Any()) {
+                        if (!query.Any()) {
 
-                                Students student = new Students {
-                                    UId = uID,
-                                    FirstName = fName,
-                                    LastName = lName,
-                                    Dob = DOB,
-                                    Major = SubjectAbbrev
-                                };
+                            Professors prof = new Professors {
+                                UId = uID,
+                                FirstName = fName,
+                                LastName = lName,
+                                Dob = DOB,
+                                Department = SubjectAbbrev
+                            };
 
-                                db.Students.Add(student);
+                            db.Professors.Add(prof);
 
-                                try {
-                                    db.SaveChanges();
-                                }
-                                catch (Exception e) {
-                                    Console.WriteLine(e.Message);
-                                }
-                                break;
+                            try {
+                                db.SaveChanges();
                             }
+                            catch (Exception e) {
+                                Console.WriteLine(e.Message);
+                            }
+                            break;
                         }
-                        break;
-                    default:
-                        Console.WriteLine("SOMETHING WENT WRONG");
-                        break;
+                    }
+                    break;
+                case "Student":
+                    while (true) {
+                        uID = "u" + RandomNumber(0, 9999999).ToString();
 
-                }
+                        var query =
+                            from a in db.Students
+                            where a.UId == uID
+                            select a;
 
-                return uID;
+                        if (!query.Any()) {
+
+                            Students student = new Students {
+                                UId = uID,
+                                FirstName = fName,
+                                LastName = lName,
+                                Dob = DOB,
+                                Major = SubjectAbbrev
+                            };
+
+                            db.Students.Add(student);
+
+                            try {
+                                db.SaveChanges();
+                            }
+                            catch (Exception e) {
+                                Console.WriteLine(e.Message);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                default:
+                    Console.WriteLine("SOMETHING WENT WRONG");
+                    break;
+
             }
-    }
 
-    public int RandomNumber(int min, int max) {
+            return uID;
+        }
+
+        public int RandomNumber(int min, int max) {
         Random random = new Random();
         return random.Next(min, max);
     }
