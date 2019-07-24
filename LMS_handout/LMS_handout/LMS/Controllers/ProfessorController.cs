@@ -173,10 +173,16 @@ namespace LMS.Controllers {
                         where s.AId == t.aID
                         select s;
 
-                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions  = submissionQuery.Count() });
+                    int submissions = 0;
+
+                    if (submissionQuery.Any()) {
+                        submissions = submissionQuery.Count();
+                    }
+
+                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions });
                 }
 
-                return Json(query.ToArray());
+                return Json(assignnmentsList.ToArray());
                    
             }
             else {
@@ -207,7 +213,13 @@ namespace LMS.Controllers {
                         where s.AId == t.aID
                         select s;
 
-                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions = submissionQuery.Count() });
+                    int submissions = 0;
+
+                    if (submissionQuery.Any()) {
+                        submissions = submissionQuery.Count();
+                    }
+
+                    assignnmentsList.Add(new { t.aname, t.cname, t.due, submissions });
                 }
                 return Json(assignnmentsList.ToArray());
 
@@ -360,6 +372,21 @@ namespace LMS.Controllers {
                     try {
                         //need the updated code to finish this portion 
                         db.SaveChanges();
+
+                        var enrollmentQuery =
+                            from e in db.EnrollmentGrade
+                            where e.CId == clsID
+                            select e;
+
+                        if (enrollmentQuery.Any()) {
+
+                            foreach (var enrollment in enrollmentQuery) {
+                                enrollment.Grade = getGradeForClass(enrollment.UId, clsID);
+                            }
+
+                            db.SaveChanges();
+                        }
+
                         return Json(new { success = true });
                     } catch (Exception e){
                         Console.WriteLine(e.Message);
@@ -466,11 +493,36 @@ namespace LMS.Controllers {
               select alsubs;
 
             if (query.Any()) {
-                foreach (var result in query) {
-                    result.Score = (uint) score;
-                }
+                var result = query.First();
+                result.Score = (uint) score;
+
                 try {
                     db.SaveChanges();
+
+                    var classIdQuery =
+                        from crs in db.Courses
+                        where crs.Department == subject
+                        && crs.Number == num
+                        join clss in db.Classes
+                        on crs.CatalogId equals clss.CatalogId into offerings
+
+                        from offs in offerings
+                        where offs.Semester == semester
+                        select new { cid = offs.ClassId };
+
+                    uint classId = classIdQuery.First().cid;
+
+                    var enrollmentQuery =
+                        from e in db.EnrollmentGrade
+                        where e.CId == classId
+                        && e.UId == uid
+                        select e;
+
+                    var curGrade = enrollmentQuery.First();
+                    curGrade.Grade = getGradeForClass(uid, classId);
+
+                    db.SaveChanges();
+
                     return Json(new { success = true });
                 }
                 catch (Exception e) {
@@ -516,7 +568,118 @@ namespace LMS.Controllers {
         }
 
 
+
+        // AUTO GRADE FUNCTION
+
+        string getGradeForClass(string uid, uint classID) {
+            var query =
+                //from crs in db.Courses
+                //where crs.Department == subject
+                //&& crs.Number == num
+                //join clss in db.Classes
+                //on crs.CatalogId equals clss.CatalogId into offerings
+
+                //from offs in offerings
+                //where offs.Semester == semester
+                from clss in db.Classes
+                where clss.ClassId == classID
+                join cats in db.AssignmentCategories
+                on clss.ClassId equals cats.ClassId into ClassCategories
+
+                from clsscats in ClassCategories
+                join assigns in db.Assignments
+                on clsscats.CategoryId equals assigns.Category into ClassAssignments
+
+                from clssassigns in ClassAssignments
+                join subs in db.Submission
+                on clssassigns.AId equals subs.AId into AssignmentSubmissions
+
+                from asubs in AssignmentSubmissions
+                where asubs.UId == uid
+                select new { weight = clsscats.Weight, category = clsscats.Name, score = asubs.Score, points = clssassigns.Points };
+
+            if (query.Any()) {
+                List<CategoryDetails> categories = new List<CategoryDetails>();
+                foreach (var result in query) {
+                    bool isNotInList = true;
+                    foreach (CategoryDetails cd in categories) {
+                        if (cd.name == result.category) {
+                            cd.addSubmission(result.score, result.points);
+                            isNotInList = false;
+                        }
+                    }
+                    if (isNotInList) {
+                        categories.Add(new CategoryDetails(result.category, result.weight));
+                        categories.Last().addSubmission(result.score, result.points);
+                    }
+                }
+
+                double weightedTotal = 0.0;
+                foreach (CategoryDetails cd in categories) {
+                    weightedTotal += cd.getWeightedGrade();
+                }
+
+                int classPercentage = (int) weightedTotal;
+
+                if (classPercentage > 93) {
+                    return "A";
+                }
+                if(classPercentage > 90) {
+                    return "A-";
+                }
+                if(classPercentage > 87) {
+                    return "B+";
+                }
+                if(classPercentage > 83) {
+                    return "B";
+                }
+                if (classPercentage > 80) {
+                    return "B-";
+                }
+                if (classPercentage > 77) {
+                    return "C+";
+                }
+                if (classPercentage > 73) {
+                    return "C";
+                }
+                if (classPercentage > 70) {
+                    return "C-";
+                }
+                if (classPercentage > 67) {
+                    return "D+";
+                }
+                if (classPercentage > 63) {
+                    return "D";
+                }
+
+                return "D-";
+            }
+
+            return "--";
+        }
+
+
+
         /*******End code to modify********/
 
+    }
+    public class CategoryDetails : ProfessorController {
+        public string name;
+        public double totalPoints, totalScore;
+        public double weightInDecimal;
+        public CategoryDetails(string categoryName, int weight) {
+            name = categoryName;
+            totalPoints = 0;
+            totalScore = 0;
+            weightInDecimal = weight / 100.0;
+        }
+        public void addSubmission(uint score, uint points) {
+            totalScore += score;
+            totalPoints += points;
+        }
+
+        public double getWeightedGrade() {
+            return ((totalScore / totalPoints) * 100.0) * weightInDecimal;
+        }
     }
 }

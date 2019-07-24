@@ -6,7 +6,6 @@ C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\bin\Debug\ne
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\bin\Debug\netcoreapp2.2\LMS.pdb
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\bin\Debug\netcoreapp2.2\LMS.Views.dll
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\bin\Debug\netcoreapp2.2\LMS.Views.pdb
-C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.csprojAssemblyReference.cache
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.csproj.CoreCompileInputs.cache
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.RazorAssemblyInfo.cache
 C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.RazorAssemblyInfo.cs
@@ -154,3 +153,4 @@ C:\Users\Quincy\Desktop\git\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcor
 C:\Users\Quincy\Desktop\git\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.dll
 C:\Users\Quincy\Desktop\git\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.pdb
 C:\Users\Quincy\Desktop\git\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.csproj.CopyComplete
+C:\Users\Jordan Higgins\Desktop\phase_3\LMS_handout\LMS_handout\LMS\obj\Debug\netcoreapp2.2\LMS.csprojAssemblyReference.cache
